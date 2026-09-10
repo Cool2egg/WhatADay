@@ -7,12 +7,22 @@ spring:
   application:
     name: whataday
   datasource:
-    # 第一版使用 SQLite + JdbcTemplate
-    url: jdbc:sqlite:./data/whataday.db
+    # 第一版使用 SQLite + JdbcTemplate。
+    # 通过 URL 参数应用连接级 PRAGMA（xerial sqlite-jdbc 支持）：
+    #   journal_mode=WAL   读写并发，写入不阻塞读取
+    #   busy_timeout=5000  写锁等待 5s，避免瞬时 SQLITE_BUSY
+    #   foreign_keys=on    SQLite 默认关闭外键约束，需显式开启
+    url: "jdbc:sqlite:./data/whataday.db?journal_mode=WAL&busy_timeout=5000&foreign_keys=on"
     driver-class-name: org.sqlite.JDBC
     hikari:
       # SQLite 单写入者，连接池限制为 1 以避免写锁竞争
       maximum-pool-size: 1
+  sql:
+    init:
+      # SQLite 不被 Spring Boot 识别为 embedded 数据源，默认不会执行 schema.sql，
+      # 因此必须显式设为 always；schema.sql 全部为 IF NOT EXISTS，幂等安全。
+      mode: always
+      schema-locations: classpath:schema.sql
 
 # WhatADay 业务配置
 whataday:
