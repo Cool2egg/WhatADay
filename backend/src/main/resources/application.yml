@@ -1,0 +1,40 @@
+server:
+  # 安全要求：只监听本机回环地址
+  address: 127.0.0.1
+  port: 8080
+
+spring:
+  application:
+    name: whataday
+  datasource:
+    # 第一版使用 SQLite + JdbcTemplate
+    url: jdbc:sqlite:./data/whataday.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      # SQLite 单写入者，连接池限制为 1 以避免写锁竞争
+      maximum-pool-size: 1
+
+# WhatADay 业务配置
+whataday:
+  collector:
+    # mock：无需 Windows 环境 / 模型 Key 即可开发与演示
+    # windows：真实读取前台窗口并截图
+    mode: mock
+    # 隐私：敏感应用不截图、不调用模型
+    excluded-processes:
+      - WeChat.exe
+      - Alipay.exe
+      - 1Password.exe
+      - KeePass.exe
+
+# OpenAPI / Swagger UI： http://127.0.0.1:8080/swagger-ui.html
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    root: INFO
+    com.example.whataday: DEBUG
