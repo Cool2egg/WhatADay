@@ -1,0 +1,20 @@
+# 让 Git 自动识别文本文件并统一以 LF 存入仓库，
+# 避免在不同编辑器/平台之间产生「整份文件都改了」的假 diff。
+* text=auto eol=lf
+
+# Windows 批处理脚本必须保持 CRLF，否则可能无法执行
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件不做行尾转换
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.jar  binary
+*.db   binary
+
+# 前端 lockfile 内容冗长，折叠其 diff 噪音
+package-lock.json -diff
