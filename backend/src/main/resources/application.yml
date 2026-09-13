@@ -59,6 +59,11 @@ whataday:
     log-requests: false
     log-responses: false
 
+  # 日报定时任务：默认每天 22:00 生成当天日报（PROJECT_PLAN 第 5.3 节）
+  # 演示时可以改成 "0 * * * * *"（每分钟）立刻看到效果
+  report:
+    cron: "0 0 22 * * *"
+
 # OpenAPI / Swagger UI： http://127.0.0.1:8080/swagger-ui.html
 springdoc:
   swagger-ui:
@@ -69,4 +74,6 @@ springdoc:
 logging:
   level:
     root: INFO
-    com.example.whataday: DEBUG
+    # 默认 INFO：DEBUG 会打印采集与分析的细节日志。
+    # 注意本项目从不打印窗口标题、截图内容或手动记录正文，排障时可临时调到 DEBUG。
+    com.example.whataday: INFO
