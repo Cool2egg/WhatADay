@@ -43,6 +43,8 @@ pnpm-debug.log*
 # 采集截图临时目录（分析后即删，不应入库）
 screenshots/
 *.tmp
+# 前端构建产物复制到后端 static 的目录（由 scripts/build-all.sh 生成）
+backend/src/main/resources/static/
 
 # ==================== 日志 ====================
 logs/
