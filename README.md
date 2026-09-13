@@ -115,6 +115,23 @@ whataday:
 采集器每 30 秒读取一次前台窗口；窗口变化时才产生新观察，并按节流规则决定是否截图。
 截图会按宽度缩放后落盘，**分析完成后立即删除**，不会在磁盘上留存。
 
+### 接入视觉模型
+
+默认**不启用**视觉模型：没有配置 API Key 时，活动分析会自动退回「仅用窗口信息」的降级模式
+（`source = WINDOW_FALLBACK`），应用照常运行。要启用，设置环境变量即可——Key 不写进配置文件：
+
+```powershell
+# Windows PowerShell
+$env:WHATADAY_VISION_API_KEY  = "sk-..."
+# 可选：换用任意 OpenAI 兼容端点（下面以通义千问 VL 为例）
+$env:WHATADAY_VISION_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+$env:WHATADAY_VISION_MODEL    = "qwen-vl-plus"
+```
+
+然后照常 `mvn spring-boot:run`。模型会把「应用名 + 窗口标题 + 时间 + 截图」理解成
+结构化的活动类型、描述、关键词与置信度；任何调用失败都会被捕获并降级，不会中断采集。
+若所用端点不支持 `response_format` 参数，把 `whataday.vision.use-json-response-format` 设为 `false`。
+
 ## 开发进度
 
 | 里程碑 | 内容 | 状态 |
@@ -124,7 +141,7 @@ whataday:
 | M2 | Mock 数据 + REST API + Swagger | ✅ 已完成 |
 | M3 | 前端四页（工作台/时间线/日报/记录） | ✅ 已完成 |
 | M4 | JNA 前台窗口 + Robot 截图 | ✅ 已完成 |
-| M5 | 视觉模型接入 + 失败降级 | ⬜ 待开始 |
+| M5 | 视觉模型接入 + 失败降级 | ✅ 已完成 |
 | M6 | Agent 日报 + Scheduler + 收尾 | ⬜ 待开始 |
 
 详见 [DEV_ROADMAP.md](DEV_ROADMAP.md)。
