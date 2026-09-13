@@ -132,6 +132,30 @@ $env:WHATADAY_VISION_MODEL    = "qwen-vl-plus"
 结构化的活动类型、描述、关键词与置信度；任何调用失败都会被捕获并降级，不会中断采集。
 若所用端点不支持 `response_format` 参数，把 `whataday.vision.use-json-response-format` 设为 `false`。
 
+### 打包为单个 jar（演示推荐）
+
+前后端一起构建，产出一个可独立运行的 jar，不需要再单独启动前端服务：
+
+```bash
+bash scripts/build-all.sh
+java -jar backend/target/whataday-*.jar
+# 打开 http://127.0.0.1:8080
+```
+
+Windows 上等价的手动步骤（在仓库根目录执行）：
+
+```powershell
+cd frontend; npm install; npm run build; cd ..
+Remove-Item -Recurse -Force backend\src\main\resources\static -ErrorAction SilentlyContinue
+New-Item -ItemType Directory -Force backend\src\main\resources\static | Out-Null
+Copy-Item -Recurse frontend\dist\* backend\src\main\resources\static\
+cd backend; mvn clean package -DskipTests; cd ..
+java -jar backend\target\whataday-*.jar
+```
+
+打包后前端路由（`/timeline`、`/reports` 等）由后端回退到 `index.html` 处理，
+所以在浏览器里直接访问或刷新这些地址都能正常打开。
+
 ## 开发进度
 
 | 里程碑 | 内容 | 状态 |
@@ -142,7 +166,7 @@ $env:WHATADAY_VISION_MODEL    = "qwen-vl-plus"
 | M3 | 前端四页（工作台/时间线/日报/记录） | ✅ 已完成 |
 | M4 | JNA 前台窗口 + Robot 截图 | ✅ 已完成 |
 | M5 | 视觉模型接入 + 失败降级 | ✅ 已完成 |
-| M6 | Agent 日报 + Scheduler + 收尾 | ⬜ 待开始 |
+| M6 | Agent 日报 + Scheduler + 收尾 | ✅ 已完成 |
 
 详见 [DEV_ROADMAP.md](DEV_ROADMAP.md)。
 
