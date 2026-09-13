@@ -159,7 +159,7 @@ public class DesktopCollectorService implements CollectorService {
             observationRepository.insert(new CaptureObservation(
                     null, now, current.appName(), current.windowTitle(),
                     AnalysisStatus.IGNORED, "命中敏感应用黑名单，未截图、未调用模型", null));
-            log.debug("命中敏感应用，已忽略：{}", current.processName());
+            log.debug("命中敏感应用黑名单，本次仅记录忽略状态");
             return 1;
         }
 
