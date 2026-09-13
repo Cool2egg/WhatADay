@@ -98,7 +98,7 @@ whataday:
 |---|---|---|
 | M0 | 仓库初始化 + 前后端骨架 + 工程规范 | ✅ 已完成 |
 | M1 | SQLite 表结构 + JdbcTemplate Repository | ✅ 已完成 |
-| M2 | Mock 数据 + REST API + Swagger | ⬜ 待开始 |
+| M2 | Mock 数据 + REST API + Swagger | ✅ 已完成 |
 | M3 | 前端四页（工作台/时间线/日报/记录） | ⬜ 待开始 |
 | M4 | JNA 前台窗口 + Robot 截图 | ⬜ 待开始 |
 | M5 | 视觉模型接入 + 失败降级 | ⬜ 待开始 |
