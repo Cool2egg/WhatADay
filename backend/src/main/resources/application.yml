@@ -43,6 +43,22 @@ whataday:
     merge-gap-minutes: 5             # 相邻事件间隔超过这个值就不合并
     screenshot-max-width: 1280       # 截图缩放后的最大宽度
 
+  # 视觉模型：把「窗口信息 + 截图」理解成结构化活动事件
+  # API Key 只从环境变量读取，绝不写进配置文件，避免密钥随代码入库。
+  # 未设置 Key 时不创建模型，分析会自动退回窗口降级，应用照常运行。
+  vision:
+    api-key: ${WHATADAY_VISION_API_KEY:}
+    base-url: ${WHATADAY_VISION_BASE_URL:https://api.openai.com/v1}
+    model-name: ${WHATADAY_VISION_MODEL:gpt-4o-mini}
+    timeout-seconds: 30
+    max-tokens: 500
+    temperature: 0.0
+    # 部分 OpenAI 兼容端点不支持 response_format 参数，遇到调用报错可设为 false
+    use-json-response-format: true
+    # 打开会打印包含截图内容的请求体，仅排障时临时使用
+    log-requests: false
+    log-responses: false
+
 # OpenAPI / Swagger UI： http://127.0.0.1:8080/swagger-ui.html
 springdoc:
   swagger-ui:
