@@ -6,6 +6,8 @@ import com.example.whataday.activity.ActivityType;
 import com.example.whataday.common.NotFoundException;
 import com.example.whataday.note.NoteRepository;
 import com.example.whataday.note.UserNote;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,22 +18,39 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-/** 日报的生成与查询。 */
+/**
+ * 日报的生成与查询。
+ *
+ * <p>生成有两条路径：
+ * <ol>
+ *   <li><b>Agent 路径</b>——配置了模型时，由 {@link DailyReportAgent} 通过工具查询数据并用模型
+ *       归纳成日报。Agent 自己调用 {@code saveDailyReport} 落库，本类只负责触发与读回。</li>
+ *   <li><b>启发式路径</b>——没有模型、或 Agent 调用失败时，退回按活动类型挑选内容的确定性实现。
+ *       它写不出有概括力的日报，但能保证「没有 API Key 也能完整演示日报功能」这条底线。</li>
+ * </ol>
+ * 两条路径的接口与数据结构完全一致，前端无感知。
+ */
 @Service
 public class ReportService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReportService.class);
 
     private static final DateTimeFormatter HH_MM = DateTimeFormatter.ofPattern("HH:mm");
 
     private final ActivityRepository activityRepository;
     private final NoteRepository noteRepository;
     private final ReportRepository reportRepository;
+    /** 未配置模型时为空。 */
+    private final Optional<DailyReportAgent> agent;
 
     public ReportService(ActivityRepository activityRepository,
                          NoteRepository noteRepository,
-                         ReportRepository reportRepository) {
+                         ReportRepository reportRepository,
+                         Optional<DailyReportAgent> agent) {
         this.activityRepository = activityRepository;
         this.noteRepository = noteRepository;
         this.reportRepository = reportRepository;
+        this.agent = agent;
     }
 
     public Optional<DailyReport> find(LocalDate date) {
@@ -48,21 +67,45 @@ public class ReportService {
      *
      * <p>重复调用是幂等的：日期是主键，写入走 upsert，同一天永远只有一条记录。
      * 当天既没有活动也没有手动记录时抛 404。
-     *
-     * <p><b>说明：</b>下面用「按活动类型挑选内容」的启发式规则生成日报，是 M2 的占位实现，
-     * 目的是让前端与接口先行跑通。M6 会由 LangChain4j Agent 通过 Tool Calling 读取同一批数据，
-     * 用模型生成真正有概括力的日报，届时替换本方法内部逻辑即可，接口与数据结构不变。
      */
     public DailyReport generate(LocalDate date) {
         LocalDate target = date != null ? date : LocalDate.now();
 
         List<ActivityEvent> activities = activityRepository.findByDate(target);
         List<UserNote> notes = noteRepository.findByDate(target);
-
         if (activities.isEmpty() && notes.isEmpty()) {
             throw new NotFoundException(target + " 没有任何活动记录或手动记录，无法生成日报");
         }
 
+        return generateByAgent(target)
+                .orElseGet(() -> generateHeuristically(target, activities, notes));
+    }
+
+    /** 让 Agent 生成；它没落库、或调用失败，都返回空表示「请走降级」。 */
+    private Optional<DailyReport> generateByAgent(LocalDate date) {
+        if (agent.isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            String summary = agent.get().chat("请生成 " + date + " 的工作日报。");
+            log.info("日报 Agent 完成，返回：{}", summary);
+            // Agent 通过 saveDailyReport 工具落库；读回以拿到真实的 createdAt / updatedAt
+            return reportRepository.findByDate(date);
+        } catch (Exception e) {
+            log.warn("日报 Agent 生成失败，回退到启发式实现：{}", e.toString());
+            return Optional.empty();
+        }
+    }
+
+    /**
+     * 启发式实现：按活动类型挑选内容。
+     *
+     * <p>这是确定性规则，写不出有概括力的日报——它的价值在于兜底，
+     * 保证没有模型时整条链路依然完整可演示。
+     */
+    private DailyReport generateHeuristically(LocalDate target,
+                                              List<ActivityEvent> activities,
+                                              List<UserNote> notes) {
         DailyReport report = new DailyReport(
                 target,
                 buildTimeline(activities, notes),
@@ -74,7 +117,6 @@ public class ReportService {
                 null);
 
         reportRepository.upsert(report);
-        // 读回落库结果，返回的 createdAt / updatedAt 才是真实值
         return reportRepository.findByDate(target)
                 .orElseThrow(() -> new NotFoundException("日报写入后未能读回：" + target));
     }
