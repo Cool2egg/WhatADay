@@ -14,15 +14,11 @@ import java.time.Duration;
 public class VisionModelConfig {
 
     /**
-     * 创建视觉模型；<b>未配置 API Key 时不创建这个 Bean</b>，
-     * 分析器会自动退回窗口降级，因此无 Key 也能完整运行整个应用。
-     *
-     * <p>这里用 {@link ConditionalOnExpression} 而不是 {@code @ConditionalOnProperty}：
-     * Key 未设置时属性值是空字符串，而 {@code @ConditionalOnProperty} 会把
-     * 「属性存在但为空」判为匹配，结果就是拿着空 Key 去构建模型并在启动时报错。
+     * 创建语言/视觉模型；<b>未配置 API Key 时不创建这个 Bean</b>，
+     * 活动分析会自动退回窗口降级、日报生成会退回启发式实现，因此无 Key 也能完整运行应用。
      */
     @Bean
-    @ConditionalOnExpression("'${whataday.vision.api-key:}'.length() > 0")
+    @ConditionalOnExpression(ModelConditions.API_KEY_PRESENT)
     public ChatLanguageModel visionChatModel(VisionModelProperties properties) {
         OpenAiChatModel.OpenAiChatModelBuilder builder = OpenAiChatModel.builder()
                 .apiKey(properties.getApiKey())
