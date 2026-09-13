@@ -7,10 +7,12 @@
 采集与理解过程以**本地优先**为原则：敏感应用不截图，分析后立即删除原始截图，默认只保存结构化活动。
 
 <p align="center">
-  <img src="docs/images/demo.png" alt="WhatADay 界面预览" width="860">
+  <img src="docs/images/dashboard.png" alt="WhatADay 今日工作台" width="860">
 </p>
 
-> 📷 效果图占位，将在前端完成后补上（见 Roadmap M3）。
+> 📷 **待补截图**：把后端 `mvn spring-boot:run` 和前端 `npm run dev` 一起跑起来，
+> 访问 http://127.0.0.1:5173 ，截图存到 `docs/images/` 下（建议 `dashboard.png` 工作台、
+> `timeline.png` 时间线、`reports.png` 日报 三张），然后删掉这段提示。
 
 ---
 
@@ -99,7 +101,7 @@ whataday:
 | M0 | 仓库初始化 + 前后端骨架 + 工程规范 | ✅ 已完成 |
 | M1 | SQLite 表结构 + JdbcTemplate Repository | ✅ 已完成 |
 | M2 | Mock 数据 + REST API + Swagger | ✅ 已完成 |
-| M3 | 前端四页（工作台/时间线/日报/记录） | ⬜ 待开始 |
+| M3 | 前端四页（工作台/时间线/日报/记录） | ✅ 已完成 |
 | M4 | JNA 前台窗口 + Robot 截图 | ⬜ 待开始 |
 | M5 | 视觉模型接入 + 失败降级 | ⬜ 待开始 |
 | M6 | Agent 日报 + Scheduler + 收尾 | ⬜ 待开始 |
