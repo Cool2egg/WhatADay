@@ -28,7 +28,7 @@ spring:
 whataday:
   collector:
     # mock：无需 Windows 环境 / 模型 Key 即可开发与演示
-    # windows：真实读取前台窗口并截图
+    # desktop：真实读取前台窗口并按需截图（需要 Windows 用户桌面会话）
     mode: mock
     # 隐私：敏感应用不截图、不调用模型
     excluded-processes:
@@ -36,6 +36,12 @@ whataday:
       - Alipay.exe
       - 1Password.exe
       - KeePass.exe
+    # 以下均为 desktop 模式的采集参数，对应 PROJECT_PLAN 第 5.1 节
+    window-poll-seconds: 30          # 读取前台窗口的间隔
+    screenshot-min-interval-seconds: 120   # 两次截图之间的最小间隔
+    max-merge-minutes: 30            # 单个活动最多合并到多少分钟
+    merge-gap-minutes: 5             # 相邻事件间隔超过这个值就不合并
+    screenshot-max-width: 1280       # 截图缩放后的最大宽度
 
 # OpenAPI / Swagger UI： http://127.0.0.1:8080/swagger-ui.html
 springdoc:

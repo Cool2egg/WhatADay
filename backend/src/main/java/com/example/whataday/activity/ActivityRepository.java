@@ -83,6 +83,20 @@ public class ActivityRepository {
         return jdbc.update("DELETE FROM activity_event WHERE id = ?", id);
     }
 
+    /** 某一天最近的一条活动，用于判断新事件能否并入（合并逻辑）。 */
+    public Optional<ActivityEvent> findLatest(LocalDate date) {
+        return jdbc.query(
+                SELECT_ALL + " WHERE start_time >= ? AND start_time < ? ORDER BY start_time DESC LIMIT 1",
+                this::mapRow, Timestamps.dayStart(date), Timestamps.dayEnd(date))
+                .stream().findFirst();
+    }
+
+    /** 推进某条活动的结束时间（合并时使用）。 */
+    public int updateEndTime(long id, LocalDateTime endTime) {
+        return jdbc.update("UPDATE activity_event SET end_time = ? WHERE id = ?",
+                Timestamps.format(endTime), id);
+    }
+
     public int count() {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM activity_event", Integer.class);
         return count == null ? 0 : count;

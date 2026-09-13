@@ -17,6 +17,6 @@ public interface CollectorService {
     /** 停止采集；未运行时不报错（幂等）。 */
     CollectorStatus stop();
 
-    /** 立即采集一次，返回本次新增的活动事件数。 */
+    /** 立即采集一次，返回本次新增的采集条数（0 表示窗口未变化或未读到窗口）。 */
     int captureNow();
 }
