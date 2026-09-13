@@ -6,6 +6,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons'
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import { today } from '@/utils/format'
 
 const { Header, Sider, Content } = Layout
 
@@ -21,12 +22,17 @@ export default function App() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <Typography.Title level={4} style={{ color: '#fff', margin: 0 }}>
+      <Header style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        <Typography.Title level={4} style={{ color: '#fff', margin: 0, letterSpacing: 0.5 }}>
           WhatADay
         </Typography.Title>
-        <Typography.Text style={{ color: 'rgba(255,255,255,0.65)', marginLeft: 12 }}>
+        <Typography.Text style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13 }}>
           工作复盘 Agent
+        </Typography.Text>
+        <Typography.Text
+          style={{ color: 'rgba(255,255,255,0.55)', fontSize: 13, marginLeft: 'auto' }}
+        >
+          {today()}
         </Typography.Text>
       </Header>
       <Layout>
@@ -35,10 +41,10 @@ export default function App() {
             mode="inline"
             selectedKeys={[location.pathname]}
             items={NAV_ITEMS}
-            style={{ height: '100%', borderRight: 0 }}
+            style={{ height: '100%', borderRight: 0, paddingTop: 8 }}
           />
         </Sider>
-        <Content style={{ padding: 24 }}>
+        <Content style={{ padding: 20 }}>
           <Outlet />
         </Content>
       </Layout>

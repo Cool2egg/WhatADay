@@ -4,3 +4,120 @@ body,
   height: 100%;
   margin: 0;
 }
+
+body {
+  background: #f4f5f6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============ 一天的时间条（工作台主角） ============ */
+.ribbon-track {
+  position: relative;
+  height: 58px;
+  border-radius: 6px;
+  background-color: #eceef0;
+  /* 每 25% 一条浅竖线，对应 6 小时刻度 */
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(20, 30, 40, 0.07) 0 1px,
+    transparent 1px 25%
+  );
+  overflow: hidden;
+}
+
+.ribbon-block {
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  border-radius: 3px;
+  min-width: 3px;
+  transition: filter 0.15s ease;
+}
+
+.ribbon-block:hover {
+  filter: brightness(1.15);
+}
+
+.ribbon-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7480;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============ 时间线列表 ============ */
+.timeline-row {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eef0f2;
+}
+
+.timeline-row:last-child {
+  border-bottom: none;
+}
+
+.timeline-marker {
+  width: 3px;
+  border-radius: 2px;
+  flex: none;
+}
+
+.timeline-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.timeline-time {
+  font-variant-numeric: tabular-nums;
+  color: #6b7480;
+  font-size: 13px;
+}
+
+.timeline-desc {
+  margin: 4px 0 0;
+  color: #1c1f23;
+}
+
+.timeline-meta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7480;
+}
+
+/* ============ 日报 ============ */
+.report-section + .report-section {
+  margin-top: 22px;
+}
+
+.report-section h4 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1c1f23;
+}
+
+.report-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #1c1f23;
+}
+
+.report-list li {
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+.report-empty {
+  color: #9aa3ad;
+  font-size: 13px;
+}
