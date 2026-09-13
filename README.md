@@ -94,6 +94,27 @@ whataday:
     mode: mock
 ```
 
+启动时会自动灌入当天示例数据（覆盖全部七种活动类型）并生成一份日报，前端一打开就有内容。
+
+### 桌面采集模式（Windows）
+
+要采集真实的前台窗口，把 `mode` 改成 `desktop`：
+
+```yaml
+whataday:
+  collector:
+    mode: desktop
+    excluded-processes:      # 命中黑名单的应用：不截图、不调用模型
+      - WeChat.exe
+      - Alipay.exe
+    window-poll-seconds: 30          # 读取前台窗口的间隔
+    screenshot-min-interval-seconds: 120   # 两次截图之间的最小间隔
+    max-merge-minutes: 30            # 单个活动最多合并到多少分钟
+```
+
+采集器每 30 秒读取一次前台窗口；窗口变化时才产生新观察，并按节流规则决定是否截图。
+截图会按宽度缩放后落盘，**分析完成后立即删除**，不会在磁盘上留存。
+
 ## 开发进度
 
 | 里程碑 | 内容 | 状态 |
@@ -102,7 +123,7 @@ whataday:
 | M1 | SQLite 表结构 + JdbcTemplate Repository | ✅ 已完成 |
 | M2 | Mock 数据 + REST API + Swagger | ✅ 已完成 |
 | M3 | 前端四页（工作台/时间线/日报/记录） | ✅ 已完成 |
-| M4 | JNA 前台窗口 + Robot 截图 | ⬜ 待开始 |
+| M4 | JNA 前台窗口 + Robot 截图 | ✅ 已完成 |
 | M5 | 视觉模型接入 + 失败降级 | ⬜ 待开始 |
 | M6 | Agent 日报 + Scheduler + 收尾 | ⬜ 待开始 |
 
