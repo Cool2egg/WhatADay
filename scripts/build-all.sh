@@ -23,7 +23,7 @@ mkdir -p "$STATIC_DIR"
 cp -r frontend/dist/. "$STATIC_DIR/"
 
 echo "==> 3/3 打包后端"
-(cd backend && mvn -B clean package -DskipTests)
+(cd backend && ./mvnw -B clean package -DskipTests)
 
 echo ""
 echo "构建完成，产物："

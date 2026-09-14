@@ -64,7 +64,9 @@ ActivityEvent + UserNote → DailyReportAgent → DailyReport
 
 ## 快速开始
 
-> 环境要求：JDK 17+、Node.js 18+、Maven 3.9+。
+> 环境要求：JDK 17+、Node.js 18+。
+> 项目自带 **Maven Wrapper**，**不需要单独安装 Maven**——Windows 用 `mvnw.cmd`，macOS / Linux 用 `./mvnw`，
+> 下文出现的 `mvn` 命令都可以替换成它们（首次运行会自动下载 Maven）。
 > 采集器需运行在 Windows 用户桌面会话中；Mock 模式无此要求。
 
 ### 后端
