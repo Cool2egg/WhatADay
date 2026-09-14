@@ -10,10 +10,6 @@
   <img src="docs/images/dashboard.png" alt="WhatADay 今日工作台" width="860">
 </p>
 
-> 📷 **待补截图**：把后端 `mvn spring-boot:run` 和前端 `npm run dev` 一起跑起来，
-> 访问 http://127.0.0.1:5173 ，截图存到 `docs/images/` 下（建议 `dashboard.png` 工作台、
-> `timeline.png` 时间线、`reports.png` 日报 三张），然后删掉这段提示。
-
 ---
 
 ## 技术栈
@@ -52,6 +48,13 @@ ActivityEvent + UserNote → DailyReportAgent → DailyReport
 - **隐私与成本控制**：截图前先做敏感应用黑名单过滤；低频采样（每 2 分钟最多一张）；分析后立即删除原始截图；日志不输出敏感信息。
 - **失败可降级**：模型调用失败时用窗口信息生成事件（`source = WINDOW_FALLBACK`）。
 
+## 界面
+
+<p align="center">
+  <img src="docs/images/timeline.png" alt="时间线" width="49%">
+  <img src="docs/images/reports.png" alt="日报" width="49%">
+</p>
+
 ## 技术栈徽章
 
 ![Java](https://img.shields.io/badge/Java-17-orange)
@@ -83,7 +86,7 @@ mvn spring-boot:run
 cd frontend
 npm install
 npm run dev
-# 页面：http://127.0.0.1:5173
+# 页面：http://localhost:5173
 ```
 
 ### Mock 模式
