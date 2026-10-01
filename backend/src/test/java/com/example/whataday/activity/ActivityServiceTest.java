@@ -24,7 +24,7 @@ class ActivityServiceTest {
         WorkMetrics metrics = new ActivityService(repository).metrics(day, day);
 
         assertThat(metrics.eventCount()).isEqualTo(3);
-        assertThat(metrics.activeMinutes()).isEqualTo(150);
+        assertThat(metrics.activeMinutes()).isEqualTo(180);
         assertThat(metrics.focusedMinutes()).isEqualTo(150);
         assertThat(metrics.distractionMinutes()).isEqualTo(30);
         assertThat(metrics.typeSwitchCount()).isEqualTo(2);

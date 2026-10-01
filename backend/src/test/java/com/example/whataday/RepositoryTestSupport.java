@@ -23,6 +23,7 @@ public abstract class RepositoryTestSupport {
     void cleanDatabase() {
         // 子表先删，避免外键约束影响
         jdbcTemplate.execute("DELETE FROM daily_report");
+        jdbcTemplate.execute("DELETE FROM work_memory");
         jdbcTemplate.execute("DELETE FROM user_note");
         jdbcTemplate.execute("DELETE FROM activity_event");
         jdbcTemplate.execute("DELETE FROM capture_observation");

@@ -19,7 +19,7 @@ class SqliteStorageInitializerTest {
         Path path = SqliteStorageInitializer.resolveDatabaseFile("jdbc:sqlite:./data/whataday.db");
 
         assertThat(path).isNotNull();
-        assertThat(path.toString()).endsWith("data/whataday.db");
+        assertThat(path.toString().replace('\\', '/')).endsWith("data/whataday.db");
     }
 
     @Test
@@ -35,7 +35,9 @@ class SqliteStorageInitializerTest {
 
     @Test
     void resolvesAbsoluteSqliteFile() {
-        Path path = SqliteStorageInitializer.resolveDatabaseFile("jdbc:sqlite:/tmp/whataday/x.db");
+        String absoluteFile = Path.of(System.getProperty("java.io.tmpdir"),
+                "whataday", "x.db").toString();
+        Path path = SqliteStorageInitializer.resolveDatabaseFile("jdbc:sqlite:" + absoluteFile);
 
         assertThat(path).isNotNull();
         assertThat(path.isAbsolute()).isTrue();
