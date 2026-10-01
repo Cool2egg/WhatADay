@@ -1,8 +1,10 @@
 # WhatADay
 
-> 一个运行在 Windows 桌面会话中的**本地优先工作复盘 Agent**。
+> 一个本地优先的个人工作记录与复盘工具。
 
-定时读取前台应用与窗口信息、低频截取屏幕，通过视觉模型把屏幕内容转换成结构化活动事件；每天晚上由 LangChain4j Agent 通过 **Tool Calling** 查询当天活动与手动记录，自动生成并保存每日工作日报；前端可视化时间线、统计与日报。
+WhatADay 自动记录你在电脑上的工作活动，将零散的窗口变化整理成结构化时间线，并生成每日工作复盘。它帮助你回顾当天完成了什么、时间花在哪里，以及接下来应该继续处理什么。
+
+视觉理解和文本生成是可选增强能力。没有配置模型时，基础采集、统计和规则日报仍然可以运行。
 
 采集与理解过程以**本地优先**为原则：敏感应用不截图，分析后立即删除原始截图，默认只保存结构化活动。
 
@@ -12,11 +14,34 @@
 
 ---
 
+## 功能
+
+- 自动记录前台应用和窗口活动
+- 将活动整理成连续的工作时间线
+- 支持手动记录计划、问题和下一步
+- 根据当天活动生成工作日报
+- 统计工作时长和活动类型
+- 通过可选的视觉模型理解屏幕内容
+- 在模型不可用时退化为窗口信息分析
+
+## 工作方式
+
+```text
+桌面活动
+   ↓
+窗口观察与隐私过滤
+   ↓
+结构化活动事件
+   ↓
+时间线、统计与日报
+```
+
 ## 技术栈
 
 | 层 | 技术 |
 |---|---|
-| 后端 | Java 17 · Spring Boot · LangChain4j · SQLite（JdbcTemplate）· JNA · AWT Robot · Spring Scheduler · Springdoc OpenAPI |
+| 后端 | Java 17 · Spring Boot · SQLite（JdbcTemplate）· JNA · AWT Robot · Spring Scheduler · Springdoc OpenAPI |
+| AI 能力 | LangChain4j · OpenAI 兼容模型 |
 | 前端 | React · TypeScript · Vite · Ant Design · ECharts · Axios |
 
 ## 系统架构
@@ -26,9 +51,10 @@ flowchart TD
     FE["React 前端"] -->|REST API| CT["Spring Boot Controller"]
     CT --> CS["CollectorService<br/>JNA / AWT Robot"]
     CS --> CO["CaptureObservation"]
-    CO --> VA["VisionActivityAnalyzer"]
+    CO --> VA["可选的活动理解"]
     VA --> AE[("ActivityEvent · SQLite")]
-    AE --> DRA["DailyReportAgent<br/>(LangChain4j)"]
+    AE --> TL["时间线与统计"]
+    AE --> DRA["日报生成"]
     UN[("UserNote · SQLite")] --> DRA
     DRA --> DR[("DailyReport · SQLite")]
     SCH["Spring Scheduler<br/>每天 22:00"] -.-> DRA
@@ -37,16 +63,24 @@ flowchart TD
 两条独立流程：
 
 ```text
-截图 + 窗口信息 → VisionActivityAnalyzer → ActivityEvent
-ActivityEvent + UserNote → DailyReportAgent → DailyReport
+截图 + 窗口信息 → 活动理解 → ActivityEvent
+ActivityEvent + UserNote → 日报生成 → DailyReport
 ```
 
-## 核心亮点
+## 隐私设计
 
-- **LangChain4j Agent Tool Calling 自动生成日报**：Agent 只能通过三个受限工具访问数据（`queryActivityEvents` / `queryUserNotes` / `saveDailyReport`），`report_date` 唯一约束 + upsert 保证重复生成幂等。
-- **视觉模型将屏幕内容转为结构化活动事件**：输出映射为固定活动类型枚举 + 描述 + 关键词 + 置信度。
-- **隐私与成本控制**：截图前先做敏感应用黑名单过滤；低频采样（每 2 分钟最多一张）；分析后立即删除原始截图；日志不输出敏感信息。
-- **失败可降级**：模型调用失败时用窗口信息生成事件（`source = WINDOW_FALLBACK`）。
+- 敏感应用在截图前过滤，命中后不截图、不调用模型
+- 截图分析完成后立即删除，异常路径同样清理
+- 默认只保存结构化活动，不保存屏幕原图
+- 低频采样，减少不必要的截图和模型调用
+- API Key 通过环境变量配置，不写入仓库
+
+## 关键实现
+
+- 活动事件使用固定类型、描述、关键词和置信度保存，便于后续统计与检索。
+- 日报生成通过受限的数据访问工具完成，不能直接访问数据库或文件系统。
+- 日报按日期唯一保存，重复生成只更新同一天的记录。
+- 模型调用失败时退化为窗口信息分析，外部服务不可用不会阻断本地记录。
 
 ## 界面
 
@@ -164,24 +198,11 @@ java -jar backend\target\whataday-*.jar
 > 数据库文件默认生成在**工作目录**下的 `data/whataday.db`，启动日志里会打印它的绝对路径。
 > 目录不存在时会自动创建，所以从任何位置启动都能正常运行——不要求必须在 `backend` 目录里启动。
 
-## 开发进度
-
-| 里程碑 | 内容 | 状态 |
-|---|---|---|
-| M0 | 仓库初始化 + 前后端骨架 + 工程规范 | ✅ 已完成 |
-| M1 | SQLite 表结构 + JdbcTemplate Repository | ✅ 已完成 |
-| M2 | Mock 数据 + REST API + Swagger | ✅ 已完成 |
-| M3 | 前端四页（工作台/时间线/日报/记录） | ✅ 已完成 |
-| M4 | JNA 前台窗口 + Robot 截图 | ✅ 已完成 |
-| M5 | 视觉模型接入 + 失败降级 | ✅ 已完成 |
-| M6 | Agent 日报 + Scheduler + 收尾 | ✅ 已完成 |
-
-详见 [DEV_ROADMAP.md](DEV_ROADMAP.md)。
-
 ## 文档
 
-- [PROJECT_PLAN.md](PROJECT_PLAN.md) —— 功能与技术方案（做什么）
-- [DEV_ROADMAP.md](DEV_ROADMAP.md) —— 推进节奏与 GitHub 维护计划（怎么分次做）
+- [项目设计](PROJECT_PLAN.md)
+- [开发说明](DEV_ROADMAP.md)
+- [从零读懂 WhatADay](docs/从零读懂WhatADay.md)
 
 ## License
 
