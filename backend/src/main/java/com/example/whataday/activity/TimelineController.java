@@ -49,4 +49,15 @@ public class TimelineController {
             @RequestParam(required = false) ActivityType type) {
         return ApiResponse.ok(activityService.summary(date, type));
     }
+
+    @GetMapping("/metrics")
+    @Operation(summary = "日期范围工作指标",
+            description = "返回活动时长、专注时长、分心时长、类型分布和类型切换次数")
+    public ApiResponse<WorkMetrics> metrics(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ApiResponse.ok(activityService.metrics(startDate, endDate));
+    }
 }

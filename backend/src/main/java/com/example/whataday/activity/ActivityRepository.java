@@ -72,6 +72,13 @@ public class ActivityRepository {
                 this::mapRow, Timestamps.dayStart(date), Timestamps.dayEnd(date));
     }
 
+    /** 查询闭区间日期范围内的活动，按开始时间升序。 */
+    public List<ActivityEvent> findByDateRange(LocalDate startDate, LocalDate endDate) {
+        return jdbc.query(
+                SELECT_ALL + " WHERE start_time >= ? AND start_time < ? ORDER BY start_time",
+                this::mapRow, Timestamps.dayStart(startDate), Timestamps.dayEnd(endDate));
+    }
+
     /** 查询某一天、指定类型的活动（前端时间线的类型筛选）。 */
     public List<ActivityEvent> findByDateAndType(LocalDate date, ActivityType type) {
         return jdbc.query(
