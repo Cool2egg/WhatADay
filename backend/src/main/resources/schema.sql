@@ -84,3 +84,28 @@ CREATE TABLE IF NOT EXISTS daily_report (
     created_at        TEXT    NOT NULL,
     updated_at        TEXT    NOT NULL
 );
+
+-- ---------------------------------------------------------------------
+-- 5. work_memory：工作助手的长期记忆
+--
+-- embedding_json 先以可选字段保存在 SQLite 中，便于在不增加外部服务的情况下
+-- 接入向量检索；source_type + source_key 保证重复索引幂等。
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS work_memory (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_type     TEXT    NOT NULL,
+    source_key      TEXT    NOT NULL,
+    memory_date     TEXT    NOT NULL,
+    content         TEXT    NOT NULL,
+    tags_json       TEXT,
+    content_hash    TEXT    NOT NULL,
+    embedding_json  TEXT,
+    created_at      TEXT    NOT NULL,
+    updated_at      TEXT    NOT NULL,
+    UNIQUE (source_type, source_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_work_memory_date
+    ON work_memory (memory_date);
+CREATE INDEX IF NOT EXISTS idx_work_memory_source
+    ON work_memory (source_type, source_key);
