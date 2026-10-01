@@ -63,6 +63,10 @@ public class WorkMemoryRepository {
                 this::mapRow, date.toString());
     }
 
+    public List<WorkMemory> findAll() {
+        return jdbc.query(SELECT_ALL + " ORDER BY memory_date DESC, id DESC", this::mapRow);
+    }
+
     public int count() {
         Integer count = jdbc.queryForObject("SELECT COUNT(*) FROM work_memory", Integer.class);
         return count == null ? 0 : count;

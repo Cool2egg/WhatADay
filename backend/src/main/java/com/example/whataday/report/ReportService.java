@@ -4,10 +4,12 @@ import com.example.whataday.activity.ActivityEvent;
 import com.example.whataday.activity.ActivityRepository;
 import com.example.whataday.activity.ActivityType;
 import com.example.whataday.common.NotFoundException;
+import com.example.whataday.memory.WorkMemoryIndexer;
 import com.example.whataday.note.NoteRepository;
 import com.example.whataday.note.UserNote;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -42,15 +44,27 @@ public class ReportService {
     private final ReportRepository reportRepository;
     /** 未配置模型时为空。 */
     private final Optional<DailyReportAgent> agent;
+    private final Optional<WorkMemoryIndexer> memoryIndexer;
 
+    /** 保留给不含工作记忆的单元测试和嵌入式调用。 */
     public ReportService(ActivityRepository activityRepository,
                          NoteRepository noteRepository,
                          ReportRepository reportRepository,
                          Optional<DailyReportAgent> agent) {
+        this(activityRepository, noteRepository, reportRepository, agent, Optional.empty());
+    }
+
+    @Autowired
+    public ReportService(ActivityRepository activityRepository,
+                         NoteRepository noteRepository,
+                         ReportRepository reportRepository,
+                         Optional<DailyReportAgent> agent,
+                         Optional<WorkMemoryIndexer> memoryIndexer) {
         this.activityRepository = activityRepository;
         this.noteRepository = noteRepository;
         this.reportRepository = reportRepository;
         this.agent = agent;
+        this.memoryIndexer = memoryIndexer;
     }
 
     public Optional<DailyReport> find(LocalDate date) {
@@ -77,8 +91,10 @@ public class ReportService {
             throw new NotFoundException(target + " 没有任何活动记录或手动记录，无法生成日报");
         }
 
-        return generateByAgent(target)
+        DailyReport report = generateByAgent(target)
                 .orElseGet(() -> generateHeuristically(target, activities, notes));
+        memoryIndexer.ifPresent(indexer -> indexer.indexReport(report));
+        return report;
     }
 
     /** 让 Agent 生成；它没落库、或调用失败，都返回空表示「请走降级」。 */

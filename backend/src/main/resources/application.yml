@@ -59,6 +59,13 @@ whataday:
     log-requests: false
     log-responses: false
 
+  # 工作记忆 Embedding：不配置时仅保存原文，应用仍可正常运行。
+  embedding:
+    api-key: ${WHATADAY_EMBEDDING_API_KEY:${WHATADAY_VISION_API_KEY:}}
+    base-url: ${WHATADAY_EMBEDDING_BASE_URL:${WHATADAY_VISION_BASE_URL:https://api.openai.com/v1}}
+    model-name: ${WHATADAY_EMBEDDING_MODEL:text-embedding-3-small}
+    timeout-seconds: 20
+
   # 日报定时任务：默认每天 22:00 生成当天日报（PROJECT_PLAN 第 5.3 节）
   # 演示时可以改成 "0 * * * * *"（每分钟）立刻看到效果
   report:
