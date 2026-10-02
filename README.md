@@ -21,6 +21,7 @@ WhatADay 自动记录你在电脑上的工作活动，将零散的窗口变化�
 - 支持手动记录计划、问题和下一步
 - 根据当天活动生成工作日报
 - 统计工作时长和活动类型
+- 基于工作指标与历史工作记忆回答状态和效率问题（后端接口）
 - 通过可选的视觉模型理解屏幕内容
 - 在模型不可用时退化为窗口信息分析
 
@@ -81,6 +82,7 @@ ActivityEvent + UserNote → 日报生成 → DailyReport
 - 日报生成通过受限的数据访问工具完成，不能直接访问数据库或文件系统。
 - 日报按日期唯一保存，重复生成只更新同一天的记录。
 - 模型调用失败时退化为窗口信息分析，外部服务不可用不会阻断本地记录。
+- 工作助手将精确统计与历史记忆检索分开，通过受控工具回答效率变化、任务连续性和工作阻塞问题。
 
 ## 界面
 
@@ -98,6 +100,8 @@ ActivityEvent + UserNote → 日报生成 → DailyReport
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
 ![SQLite](https://img.shields.io/badge/SQLite-WAL-003b57)
 ![License](https://img.shields.io/badge/License-MIT-green)
+
+[![CI](https://github.com/Cool2egg/WhatADay/actions/workflows/ci.yml/badge.svg)](https://github.com/Cool2egg/WhatADay/actions/workflows/ci.yml)
 
 ## 快速开始
 
@@ -170,6 +174,27 @@ $env:WHATADAY_VISION_MODEL    = "qwen-vl-plus"
 然后照常 `mvn spring-boot:run`。模型会把「应用名 + 窗口标题 + 时间 + 截图」理解成
 结构化的活动类型、描述、关键词与置信度；任何调用失败都会被捕获并降级，不会中断采集。
 若所用端点不支持 `response_format` 参数，把 `whataday.vision.use-json-response-format` 设为 `false`。
+
+### 接入工作助手
+
+工作助手使用聊天模型回答工作状态问题，并可结合日期范围指标与历史工作记忆进行分析。
+聊天模型沿用视觉模型的 OpenAI 兼容配置；Embedding 可以单独配置，也可以复用同一个 API Key：
+
+```powershell
+$env:WHATADAY_VISION_API_KEY = "sk-..."
+$env:WHATADAY_EMBEDDING_MODEL = "text-embedding-3-small"
+```
+
+接口示例：
+
+```http
+POST http://127.0.0.1:8080/api/assistant/chat
+Content-Type: application/json
+
+{"message":"我最近效率为什么下降？"}
+```
+
+助手会区分统计事实和模型推断；没有聊天模型时该接口返回不可用，但本地记录、统计和日报不受影响。
 
 ### 打包为单个 jar（演示推荐）
 

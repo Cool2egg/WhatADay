@@ -45,7 +45,8 @@ WhatADay 是一个运行在 Windows 用户桌面会话中的本地优先工作�
 - 采集器要求运行在 Windows 用户桌面会话中
 - Docker 仅作为可选的后端/API 演示方式，不承担桌面采集功能
 
-明确不加入：Spring AI、多 Agent、RAG、向量数据库、MCP、Redis、消息队列、浏览器插件、Electron、WebSocket、OCR。
+当前不引入：Spring AI、多 Agent、向量数据库、MCP、Redis、消息队列、浏览器插件、Electron、WebSocket、OCR。
+工作记忆 RAG 已作为本地优先的效率助手能力加入，向量暂存 SQLite，避免增加外部服务依赖。
 
 ## 4. 系统架构
 
@@ -453,7 +454,7 @@ frontend/src
 - 全天候视频录制
 - 多用户和登录系统
 - 多 Agent 协作
-- RAG、向量数据库、MCP
+- 外部向量数据库、MCP
 - Redis、消息队列
 - OCR
 - 浏览器插件

@@ -13,14 +13,16 @@ public class OpenApiConfig {
     public OpenAPI whatADayOpenApi() {
         return new OpenAPI().info(new Info()
                 .title("WhatADay API")
-                .version("0.3.0")
+                .version("0.4.0")
                 .description("""
-                        本地优先的工作复盘 Agent。
+                        本地优先的个人工作记录、复盘与效率分析工具。
 
-                        链路：桌面采集 → 多模态理解 → 结构化持久化 → Agent Tool Calling → 自动日报。
+                        基础链路：桌面采集 → 活动理解 → 结构化持久化 → 时间线与日报。
 
-                        当前进度为 M2：Mock 数据 + REST API。采集与分析由 Mock 实现，
-                        M6 会接入视觉模型与 LangChain4j 日报 Agent，接口保持不变。
+                        工作助手链路：工作指标统计 + 历史工作记忆检索 → 受控 Agent 回答工作状态问题。
+
+                        视觉模型、Embedding 和聊天模型均为可选能力；未配置模型时，
+                        本地采集、统计和规则日报仍可运行。
                         """));
     }
 }
